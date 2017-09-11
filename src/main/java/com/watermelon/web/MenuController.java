@@ -7,14 +7,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.watermelon.pojo.User;
+
 @Controller
 @RequestMapping("/menu")
 public class MenuController {
 
 	@RequestMapping("/list")
 	public ModelAndView list(HttpServletRequest request) {
-		String txt_LoginID=(String) request.getSession().getAttribute("txt_LoginID");
-		if(txt_LoginID==null)
+		User user=(User) request.getSession().getAttribute("user");
+		if(user==null)
 		{
 			ModelAndView modelAndView = new ModelAndView("login");
 			modelAndView.addObject("message", "No login");

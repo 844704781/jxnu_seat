@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<Configuration status="OFF">
+    <Appenders>
+        <!-- 可以把日志信息输出到控制台 -->
+        <Console name="CONSOLE" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %logger{0} - %msg%n" />
+        </Console>
+        <!-- 将日志信息输出到硬盘中 -->
+        <RollingFile name="ROLLING" fileName="/home/watermelon/logs/a/jxnu_seat/log.log"
+             filePattern="/home/watermelon/logs/jxnu_seat/b/log_%d{yyyy-MM-dd}_%i.log">
+            <PatternLayout pattern="%d %p %c{1.} [%t] %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy modulate="true" interval="1"/>
+                <SizeBasedTriggeringPolicy size="1024 KB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="100"/>
+        </RollingFile>
+    </Appenders>
+    
+    <Loggers>
+        <Root level="debug">
+            <AppenderRef ref="CONSOLE" />
+            <AppenderRef ref="ROLLING"/>
+        </Root>
+        
+        <!-- 控制某些包下的类的日志级别,让org.mybatis.spring的日志信息只有抛错的时候才输出-->
+        <Logger name="org.mybatis.spring" level="error">
+            <AppenderRef ref="CONSOLE"/>
+        </Logger>
+    </Loggers>
+</Configuration>

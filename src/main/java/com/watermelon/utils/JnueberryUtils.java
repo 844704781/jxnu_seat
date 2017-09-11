@@ -25,12 +25,16 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 public class JnueberryUtils {
+	
+	private static final Logger logger = LogManager.getLogger("远程服务器操作记录");
 	private static String Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8";
 	private static String AcceptEncoding = "gzip, deflate";
 	private static String AcceptLanguage = "zh-CN,zh;q=0.8";
@@ -60,6 +64,7 @@ public class JnueberryUtils {
 			System.out.println(user.getTxt_LoginID() + "已经修改密码");
 			System.out.println("登录失败");
 			System.out.println(loginResult);
+			logger.info("用户学号:{},操作结果{}",user.getTxt_LoginID(),"操作失败:"+loginResult);
 			System.out.println("-----------------------------------");
 			return false;
 		}
@@ -68,6 +73,7 @@ public class JnueberryUtils {
 			System.out.println("-----------------------------------");
 			System.out.println("登录失败");
 			System.out.println(loginResult);
+			logger.info("用户学号:{},操作结果{}",user.getTxt_LoginID(),"登录失败"+loginResult);
 			System.out.println("-----------------------------------");
 			return false;
 		}
@@ -102,7 +108,7 @@ public class JnueberryUtils {
 		if (ele!=null&&"座位预约成功，请在6:00至9:00到图书馆刷卡确认".equals(ele.text())) {
 			System.out.println("-----------------------------------");
 			System.out.println("恭喜你，座位预定成功。");
-			
+			logger.info("操作结果{}","预定成功,座位号:"+bookSeat.getSeatNo());
 			System.out.println("-----------------------------------");
 			return "success";
 		}
@@ -110,7 +116,14 @@ public class JnueberryUtils {
 		{
 			System.out.println("预定失败");
 			System.out.println(result);
+			logger.info("操作结果{}","当前日期您已有等待签到的座位:"+bookSeat.getSeatNo());
 			return "have";
+		}
+		else if(ele!=null&&"所选座位已经被预约。".equals(ele.text()))
+		{
+			System.out.println("已经被人预约");
+			logger.info("操作结果{}","所选座位已经被预约:"+bookSeat.getSeatNo());
+			return "isBeAppointment";
 		}
 		Elements eles=document.getElementsByTag("title");
 		String title=eles.get(0).text();
@@ -119,11 +132,12 @@ public class JnueberryUtils {
 			System.out.println("-----------------------------------");
 			System.out.println("预定失败");
 			System.out.println(result);
+			logger.info("操作结果{}","远程登录失效");
 			System.out.println("-----------------------------------");
 			return "noLogin";
 		}
 		
-		return "error";
+		return result;
 	}
 
 	public static String[] getSeat(Seat seat) {
